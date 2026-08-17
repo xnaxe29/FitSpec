@@ -1,0 +1,4 @@
+# Optional posterior-sampling dependencies.
+# The deterministic FitSpec pipeline does not require these packages.
+emcee>=3
+dynesty>=2

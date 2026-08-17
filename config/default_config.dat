@@ -1,0 +1,56 @@
+# ============================================================================
+# FitSpec base configuration
+# ============================================================================
+# This file is both a defaults file and a complete reference for SHARED
+# configuration keywords. Active ``key = value`` lines are applied by default.
+# Lines beginning ``# OPTIONAL: key = example`` are recognized by FitSpec's
+# strict schema but are NOT applied unless the user supplies the key in
+# config.dat or on the command line.
+#
+# User overrides should normally go in the run-directory config.dat rather
+# than modifying this file.
+
+# --- Top-level launcher -----------------------------------------------------
+# These are optional because command-line use remains fully supported.
+# When they are supplied in the run-directory config.dat, simply running
+# ``fitspec`` from that directory is sufficient. Explicit CLI arguments win.
+# OPTIONAL: input_spectrum = /path/to/spectrum.dat
+# OPTIONAL: redshift = 0.001721
+# OPTIONAL: mode = stellar
+
+# --- Run / spectrum identification -----------------------------------------
+cluster_id = test
+spectrum_file_name = test.dat
+file_extension = test
+original_spectra_directory = ./
+instrument = HST-COS-NEW
+
+# --- Spectrum / run state ---------------------------------------------------
+# Systemic redshift. The top-level --redshift argument overrides this at app
+# construction time.
+z = 0.0
+ghost_continuum = False
+# Display-only smoothing; does not permanently rebin analysis data.
+spectral_smoothing_factor = 0
+
+# Initial mask intervals, in the wavelength coordinate of spectrum.wave.
+# These are optional and can contain any number of [lower, upper] pairs.
+# OPTIONAL: included_intervals = [[1200.0,1800.0]]
+# OPTIONAL: excluded_intervals = [[1210.0,1225.0],[1290.0,1310.0]]
+
+# --- Shared plotting defaults ----------------------------------------------
+font_size = 15
+figsize_x = 22
+figsize_y = 12
+cellnum_x = 5
+cellnum_y = 5
+fig_plot_region = all
+
+# --- Legacy/shared posterior defaults --------------------------------------
+# Retained for backwards-compatible shared configuration. Science-module
+# inference uses the mode-specific *_inference_* keywords below.
+dynesty_nwalkers = 10
+dynesty_nsteps = 500
+dynesty_discard_val = 100
+dynesty_thin_val = 10
+dynesty_dlogz = 0.5

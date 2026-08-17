@@ -1,0 +1,115 @@
+# ============================================================================
+# FitSpec emission-line configuration -- exhaustive keyword reference
+# ============================================================================
+
+# --- Line-list selection ---------------------------------------------------
+# Omit to use the packaged data/nebular_emission_line_list.csv.
+# OPTIONAL: emission_line_list_path = /path/to/custom_emission_lines.csv
+# Explicit line subset. Omitted/empty means automatic selection from the
+# loaded line list and spectrum wavelength coverage.
+# OPTIONAL: emission_lines = Halpha,Hbeta,[O_III]5007
+
+# Optional second-stage lines: fit velocity_kms/sigma_kms and every
+# emission_lines amplitude first (per component), then hold those
+# kinematics fixed and fit only these lines' amplitudes -- for weak
+# lines too marginal to usefully constrain their own kinematics. Must
+# not overlap emission_lines. Saved exactly like every other line (v,
+# sigma, amplitude, with uncertainty) -- no separate save path.
+# OPTIONAL: emission_weak_lines = [N_II]5754,[O_III]4363
+
+# Fixed integrated-flux ratios. These two values must be supplied together.
+# They are kept active as empty strings for backwards compatibility with the
+# existing ratio parser.
+emission_fixed_ratio_species =
+emission_fixed_ratio_value =
+
+# --- Kinematic components -------------------------------------------------
+emission_n_components = 1
+# Optional upper bound for automatic BIC component search.
+# OPTIONAL: emission_n_components_max = 3
+emission_bic_penalty_factor = 0.0
+emission_kinematics_mode = tied
+# Allowed: fixed, tied, free.
+#   fixed -- one velocity/sigma for the whole model, nothing fit.
+#   tied  -- one velocity/sigma per component, shared by every line
+#            in it (the default).
+#   free  -- one velocity/sigma per line, fully independent.
+
+# Freeze a whole component (every line's amplitude, its velocity/sigma)
+# once none of its lines show a significant detection, refitting the
+# remaining free components -- see emission.rejection. Off by default;
+# with automatic BIC component search (emission_n_components_max) above
+# it's this mechanism, not just BIC's parameter penalty, that keeps a
+# spuriously large N from over-fitting: each candidate N reuses the same
+# rejection pass, so extra components simply freeze out.
+emission_reject_insignificant_components = False
+# Amplitude/uncertainty threshold below which a line counts as
+# undetected in its component.
+emission_reject_snr_threshold = 3.0
+# A component's line also counts as undetected if its amplitude has
+# collapsed to within this fraction of its upper bound above 0.
+emission_reject_margin_fraction = 0.01
+emission_max_rejection_passes = 3
+
+emission_velocity_initial_kms = 0.0
+emission_velocity_bounds_kms = -250.0,250.0
+emission_sigma_initial_kms = 80.0
+emission_sigma_bounds_kms = 10.0,1500.0
+
+# Integrated line-flux amplitude ceiling. Omitted = unbounded above.
+# OPTIONAL: emission_maximum_amplitude = 1e-12
+
+# --- Flux preprocessing ----------------------------------------------------
+emission_flux_normalizing_factor = 1.0
+emission_flux_reduction = 0.0
+
+# --- Masking ---------------------------------------------------------------
+emission_mask_velocity_window_kms = 100.0
+
+# --- Optimizer -------------------------------------------------------------
+emission_minimum_fit_pixels = 10
+emission_max_function_evaluations = 20000
+
+# --- Plotting --------------------------------------------------------------
+emission_fig_velocity_limit_kms = 500.0
+# True: plot the continuum-subtracted data and line-only model (zero
+# baseline). False: plot the raw data against model + continuum, with
+# the continuum drawn as its own reference curve. Matches the original
+# tool's fig_normalized toggle exactly -- not a divide-by-continuum
+# normalization despite the name.
+emission_fig_normalized = True
+emission_fig_y_boost = 1.0
+emission_fig_plot_smoothing = 1
+# Stamp-plot residual-panel guide lines (see gui.emission.EmissionGUI._plot_stamps),
+# in units of sigma. The panel's y-range auto-expands to fit this value too.
+emission_fig_residual_sigma_limit = 3.0
+# What each stamp's x-axis shows -- the window covered is always defined
+# by emission_fig_velocity_limit_kms regardless of this choice.
+emission_fig_stamp_xaxis = velocity
+# Allowed: velocity, rest_wavelength, observed_wavelength
+# OPTIONAL: emission_fig_plot_lines = Halpha,Hbeta,[O_III]5007
+
+# --- Posterior inference ---------------------------------------------------
+emission_inference_method = deterministic
+# Allowed: deterministic, emcee, dynesty
+# <=0 means use deterministic amplitude bound; posterior sampling requires a
+# finite proper upper prior eventually.
+emission_inference_amplitude_prior_max = 0.0
+emission_inference_random_seed = -1
+emission_inference_progress = False
+emission_inference_output_path = emission_posterior.npz
+emission_inference_corner_max_parameters = 8
+
+# emcee
+emission_inference_emcee_nwalkers = 64
+emission_inference_emcee_nsteps = 4000
+emission_inference_emcee_burn = 1000
+emission_inference_emcee_thin = 5
+emission_inference_emcee_initial_scale = 0.001
+
+# dynesty
+emission_inference_dynesty_dynamic = True
+emission_inference_dynesty_nlive = 500
+emission_inference_dynesty_dlogz = 0.1
+emission_inference_dynesty_sample = auto
+emission_inference_dynesty_bound = multi

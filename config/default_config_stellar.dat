@@ -1,0 +1,146 @@
+# ============================================================================
+# FitSpec stellar configuration -- exhaustive keyword reference
+# ============================================================================
+# Active lines define the default first-pass stellar fit.
+# ``# OPTIONAL: key = example`` lines are valid, recognized keywords but are
+# absent from the runtime config until explicitly supplied by the user.
+
+# --- UV / optical regime and stellar-library selection ---------------------
+uv_optical_boundary_angstrom = 3000.0
+stellar_library = auto
+# Allowed: auto, bpass, sb99, slug, emiles
+
+# Explicit HDF5 paths. Optional because the built-in paths in
+# stellar.stellar_models.DEFAULT_H5_PATHS are used when omitted.
+# OPTIONAL: bpass_h5_path = /Users/aranjan/Documents/software/stellar_libraries/BPASS/BPASS_v2.2.1_population_library.h5
+# OPTIONAL: sb99_h5_path = /Users/aranjan/Documents/software/stellar_libraries/pySB99/SB99_population_library.h5
+# OPTIONAL: slug_h5_path = /Users/aranjan/Documents/software/stellar_libraries/SLUG/SLUG_population_library.h5
+# OPTIONAL: emiles_h5_path = /Users/aranjan/Documents/software/stellar_libraries/MILES/EMILES_population_library.h5
+
+# Common stellar-population subset controls.
+# Empty/omitted stellar_ages_myr means use the age range below.
+# OPTIONAL: stellar_ages_myr = 1,2,3,4,5,8,10,15,20,40
+stellar_age_range_myr = 0.0,20000.0
+
+# --- BPASS -----------------------------------------------------------------
+bpass_imf = imf135_300
+bpass_population = binary
+# OPTIONAL: bpass_metallicities = 0001,0002,0008,0014
+bpass_reference_mass_msun = 1000000.0
+# OPTIONAL: bpass_model_resolution_R = 20000.0
+
+# --- Starburst99 / pySB99 --------------------------------------------------
+# Flux units/normalization are inferred automatically from HDF5 provenance.
+# Unit/normalization selection is automatic from the HDF5 metadata.
+# The legacy keyword below is retained only so old config.dat files remain valid;
+# FitSpec ignores its value.
+# OPTIONAL: sb99_flux_unit = auto
+sb99_track = GENEC
+sb99_rotation = nonrot
+sb99_spectra_library = PoWR
+# OPTIONAL: sb99_metallicities = z001,z004,z008,z014,z020
+# OPTIONAL: sb99_model_resolution_R = 20000.0
+
+# --- SLUG ------------------------------------------------------------------
+slug_family = auto
+slug_subfamily = auto
+slug_specsyn = auto
+# OPTIONAL: slug_metallicities = Z0004,Z004,Z008,Z020
+# OPTIONAL: slug_model_resolution_R = 20000.0
+
+# --- E-MILES ---------------------------------------------------------------
+emiles_isochrone = Padova00
+emiles_imf = ku
+# OPTIONAL: emiles_imf_slope = 1.3
+emiles_metal_range_dex = -5.0,2.0
+# OPTIONAL: emiles_model_resolution_R = 2000.0
+emiles_fwhm_angstrom = 2.51
+
+# --- Stellar attenuation / distance ---------------------------------------
+stellar_attenuation_law = calzetti00
+# Supported by the current stellar model: calzetti00, cardelli89,
+# fitzpatrick99, gordon23_mw, gordon03_lmc, gordon03_smc.
+# Explicit distance overrides cosmology-based distance. For z=0, omission
+# retains the historical reproducible 10-kpc fallback.
+# OPTIONAL: stellar_distance_kpc = 10.0
+
+# --- Default deterministic stellar fit ------------------------------------
+# Keep the first-pass fit intentionally simple. The user can opt in to
+# kinematics and nuisance gas later.
+stellar_include_gas = False
+stellar_fit_velocity = False
+stellar_fit_sigma = False
+
+stellar_ebv_initial = 0.05
+stellar_velocity_initial_kms = 0.0
+stellar_sigma_initial_kms = 50.0
+stellar_ebv_bounds = 0.0,2.0
+stellar_velocity_bounds_kms = -500.0,500.0
+stellar_sigma_bounds_kms = 0.0,1000.0
+stellar_minimum_fit_pixels = 10
+
+# Nonlinear optimizer.
+stellar_nonlinear_jacobian = 2-point
+stellar_nonlinear_tolerance = 1e-5
+stellar_max_nfev = 100
+stellar_verbose = 2
+stellar_progress = True
+stellar_progress_every = 5
+
+# Deterministic SSP basis selection.
+# candidate: rank full loaded library once, then NNLS-fit only best N.
+# full: use every loaded SSP in each NNLS solve.
+stellar_template_selection = candidate
+stellar_candidate_max = 30
+
+# Inner non-negative linear solve.
+stellar_mass_solver = bvls
+stellar_mass_tolerance = 1e-8
+stellar_mass_max_iterations = 3000
+stellar_effective_rank_tolerance = 1e-10
+
+# --- Optional simultaneous nuisance-gas templates -------------------------
+# Used only when stellar_include_gas = True. This is NOT the dedicated
+# emission-line science fit; it prevents nebular features from biasing the
+# stellar continuum solution.
+stellar_gas_velocity_initial_kms = 0.0
+stellar_gas_sigma_initial_kms = 50.0
+stellar_gas_velocity_bounds_kms = -500.0,500.0
+stellar_gas_sigma_bounds_kms = 1.0,1000.0
+stellar_gas_peak_max_factor = 2.0
+
+# --- Stellar posterior inference ------------------------------------------
+stellar_inference_method = deterministic
+# Allowed: deterministic, emcee, dynesty
+stellar_inference_posterior_mode = conditional
+# Allowed: conditional, profile
+stellar_inference_basis_mode = candidate
+# Allowed: active, candidate, full
+stellar_inference_max_basis_templates = 32
+stellar_inference_candidate_delta_chi2_max = 25.0
+stellar_inference_active_relative_threshold = 1e-8
+stellar_inference_log10_mass_bounds = -6.0,12.0
+
+stellar_inference_gas_basis_mode = active
+# Allowed: active, full, none
+stellar_inference_gas_active_relative_threshold = 1e-8
+stellar_inference_gas_amplitude_prior_max = 0.0
+
+# emcee
+stellar_inference_emcee_nwalkers = 0
+stellar_inference_emcee_nsteps = 4000
+stellar_inference_emcee_burn = 1000
+stellar_inference_emcee_thin = 5
+stellar_inference_emcee_initial_scale = 0.001
+
+# dynesty
+stellar_inference_dynesty_dynamic = True
+stellar_inference_dynesty_nlive = 500
+stellar_inference_dynesty_dlogz = 0.1
+stellar_inference_dynesty_sample = auto
+stellar_inference_dynesty_bound = multi
+
+stellar_inference_random_seed = -1
+stellar_inference_progress = False
+stellar_inference_output_path = stellar_posterior.npz
+stellar_inference_corner_max_parameters = 10

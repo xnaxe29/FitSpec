@@ -1,0 +1,67 @@
+# ============================================================================
+# FitSpec absorption-line configuration -- exhaustive keyword reference
+# ============================================================================
+
+# --- Transition selection -------------------------------------------------
+# Omit to use packaged data/atomic_absorption_lines.csv.
+# OPTIONAL: absorption_line_list_path = /path/to/custom_atom_list.csv
+# Usually required for an interactive single-system absorption fit unless a
+# transition list is passed programmatically.
+# OPTIONAL: absorption_group = CIV
+
+# --- Kinematic components -------------------------------------------------
+absorption_n_components = 1
+
+# --- Column density, Doppler b, velocity ----------------------------------
+absorption_logN_initial = 14.0
+absorption_logN_bounds = 8.0,23.0
+absorption_b_initial_kms = 25.0
+absorption_b_bounds_kms = 1.0,300.0
+absorption_velocity_initial_kms = 0.0
+absorption_velocity_bounds_kms = -500.0,500.0
+
+# --- Partial covering ------------------------------------------------------
+absorption_partial_coverage = False
+absorption_covering_fraction_initial = 1.0
+absorption_covering_fraction_bounds = 0.0,1.0
+
+# --- Mask / profile sampling ----------------------------------------------
+absorption_mask_velocity_window_kms = 100.0
+absorption_subpixel = 1
+
+# --- Optimizer -------------------------------------------------------------
+absorption_minimum_fit_pixels = 10
+absorption_max_function_evaluations = 20000
+
+# --- Plotting --------------------------------------------------------------
+absorption_fig_velocity_limit_kms = 500.0
+# OPTIONAL: absorption_fig_plot_transitions = CIV1548,CIV1550
+
+# --- Posterior inference ---------------------------------------------------
+absorption_inference_method = deterministic
+# Allowed: deterministic, emcee, dynesty
+absorption_inference_random_seed = -1
+absorption_inference_progress = False
+absorption_inference_output_path = absorption_posterior.npz
+absorption_inference_corner_max_parameters = 8
+
+# emcee
+absorption_inference_emcee_nwalkers = 64
+absorption_inference_emcee_nsteps = 5000
+absorption_inference_emcee_burn = 1500
+absorption_inference_emcee_thin = 5
+absorption_inference_emcee_initial_scale = 0.001
+
+# dynesty
+absorption_inference_dynesty_dynamic = True
+absorption_inference_dynesty_nlive = 600
+absorption_inference_dynesty_dlogz = 0.1
+absorption_inference_dynesty_sample = auto
+absorption_inference_dynesty_bound = multi
+
+# --- Advanced programmatic-only capabilities ------------------------------
+# Cross-ion ParameterTie objects, thermal/turbulent linking, abundance-pattern
+# groups, per-region shifts, continuum adjustments, automatic freeze/reject,
+# upper-limit searches, and synthetic-spectrum controls are currently passed
+# as Python objects/arguments, not config.dat keywords. They are intentionally
+# documented here so their absence from the keyword schema is explicit.
